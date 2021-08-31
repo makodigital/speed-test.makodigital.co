@@ -1,0 +1,10 @@
+<div id="refresh-or-download">
+  <% if @speed_test.done? %>
+    <%= link_to "Download your report", speed_test_path(@speed_test, format: :pdf) %>
+  <% else %>
+    Processing results for <%= @speed_test.url %>
+    <br>
+    Status: <%= @speed_test.status_text %>
+    <span class="ajax-loader" style="visibility: inherit;"></span>
+  <% end %>
+</div>

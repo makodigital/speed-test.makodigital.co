@@ -1,0 +1,8 @@
+document.querySelector('#refresh-or-download').insertAdjacentHTML("afterend", "<%= j render('refresh_or_download') %>");
+document.querySelector('#refresh-or-download').remove();
+if (document.querySelector('#refresh-or-download').innerText != 'Download your report') {
+  window.setTimeout(function(){
+    window.document.querySelector('#sync').click();
+  }, 3000)
+}
+

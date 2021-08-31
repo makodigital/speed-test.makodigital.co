@@ -11,6 +11,31 @@ class SpeedTest < ApplicationRecord
     super("http://#{value}")
   end
 
+  def status_text
+    return 'Fetching website' if gtmetrix_test_id.blank?
+
+    return 'Analyzing critical metrics' if gtmetrix_report_id.blank?
+
+    return 'Generating report' if gtmetrix_report_data.blank?
+
+    return 'Done!'
+  end
+
+  def done?
+    gtmetrix_report_data.present?
+  end
+
+  def continue_process
+    return if done?
+    return if gtmetrix_test_id.blank?
+
+    ContinueSpeedTestJob.perform_later(id, 'get_report_id') and return if gtmetrix_report_id.blank?
+
+    ContinueSpeedTestJob.perform_later(id, 'report_url') and return if gtmetrix_report_url.blank?
+
+    ContinueSpeedTestJob.perform_later(id, 'report') and return if gtmetrix_report_data.blank?
+  end
+
   def start
     return if gtmetrix_test_id
 
@@ -29,6 +54,7 @@ class SpeedTest < ApplicationRecord
     res = JSON.parse(response.body)
     test_id = res.dig('data', 'id')
     update! gtmetrix_test_id: test_id if test_id.present?
+    ContinueSpeedTestJob.perform_later(id, 'get_report_id')
   end
 
   def get_report_id
@@ -41,6 +67,7 @@ class SpeedTest < ApplicationRecord
     res = JSON.parse(response.body)
     report_id = res.dig('data', 'links', "report").split("/").last
     update! gtmetrix_report_id: report_id if report_id.present?
+    ContinueSpeedTestJob.perform_later(id, 'report_url')
   end
 
   def report_url
@@ -54,6 +81,7 @@ class SpeedTest < ApplicationRecord
 
     res = JSON.parse(response.body)
     update! gtmetrix_report_url: res.dig("data", "links", "report_pdf")
+    ContinueSpeedTestJob.perform_later(id, 'report')
   end
 
   def report
@@ -69,7 +97,6 @@ class SpeedTest < ApplicationRecord
       location = "https://gtmetrix.com#{response['location']}"
       warn "redirected to #{location}"
       redirect_response = execute(location, nil, method: :get)
-      p redirect_response
       return unless redirect_response.kind_of? Net::HTTPSuccess
       update!(gtmetrix_report_data: redirect_response.body)
       # File.binwrite("thepdf.pdf", redirect_response.body)

@@ -10,7 +10,13 @@
   <div class="elementor-widget-container">
     <div class="elementor-shortcode"><div role="form" class="wpcf7" id="wpcf7-f776-p782-o1" lang="en-US" dir="ltr">
       <div class="screen-reader-response"><p role="status" aria-live="polite" aria-atomic="true"></p> <ul></ul></div>
-        <%= render 'form' %>
+        <%= render 'refresh_or_download' %>
+        <script>
+          window.setTimeout(function(){
+            document.querySelector('#sync').click();
+          }, 3000)
+        </script>
+        <%= link_to "", speed_test_path(@speed_test), remote: true, style: 'display: none;', id: 'sync' %>
       </div>
     </div>
   </div>

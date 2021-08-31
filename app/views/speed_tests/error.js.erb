@@ -1,1 +1,2 @@
-alert("error")
+document.querySelector('#main-form').insertAdjacentHTML("afterend", "<%= j render('form') %>");
+document.querySelector('#main-form').remove();

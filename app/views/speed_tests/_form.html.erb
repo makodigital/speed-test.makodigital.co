@@ -1,0 +1,28 @@
+<%= form_with model: @speed_test, local: false, html: { id: 'main-form', class: 'wpcf7-form init xs-home-light9-form xs-home-10-form' } do |form| %>
+  <div class="row">
+    <div class="col-lg-6 xs-mb-4">
+      <span class="wpcf7-form-control-wrap your-name">
+        <%= form.text_field :url, class: 'wpcf7-form-control wpcf7-text', placeholder: 'Enter your website URL' %>
+        <% if @speed_test.errors[:url].any? %>
+          <span class="wpcf7-not-valid-tip" aria-hidden="true">This field must be a URL.</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="col-lg-6 xs-mb-4">
+      <span class="wpcf7-form-control-wrap your-email">
+        <%= form.text_field :email, class: 'wpcf7-form-control wpcf7-text', placeholder: 'Enter your email address' %>
+        <% if @speed_test.errors[:email].any? %>
+          <span class="wpcf7-not-valid-tip" aria-hidden="true">This field must be an email.</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="col-lg-12">
+      <%= form.submit 'Start Test Now', class: "wpcf7-form-control wpcf7-submit" %>
+    </div>
+  </div>
+  <% if @speed_test.errors.any? %>
+    <div class="wpcf7-response-output" aria-hidden="true">
+      One or more fields have an error. Please check and try again.
+    </div>
+  <% end %>
+<% end %>
